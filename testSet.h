@@ -108,7 +108,6 @@ public:
       // Remove
       test_clear_empty();
       test_clear_standard();
-//      test_eraseRange_several();
       test_eraseIterator_empty();
       test_eraseIterator_standardMissing();
       test_eraseIterator_noChildren();
@@ -117,13 +116,14 @@ public:
       test_eraseValue_empty();
       test_eraseValue_standardMissing();
       test_eraseValue_noChildren();
-//      test_eraseValue_oneChild();
-//      test_eraseValue_twoChildren();
-//      test_eraseRange_standardNone();
-//      test_eraseRange_standardOne();
-//      test_eraseRange_standardMany();
-//      test_eraseRange_oneChild();
-//      test_eraseRange_twoChildren();
+      test_eraseValue_oneChild();
+      test_eraseValue_twoChildren();
+      test_eraseRange_standardNone();
+      test_eraseRange_standardOne();
+      test_eraseRange_standardMany();
+      test_eraseRange_oneChild();
+      test_eraseRange_twoChildren();
+      test_eraseRange_several();
 
 
       // Status

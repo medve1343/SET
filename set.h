@@ -182,8 +182,7 @@ public:
        auto it = itBegin;
        while(it != itEnd)
        {
-           erase(it);
-           it++;
+           it = erase(it);
 //           std::cout << "YOLO" << std::endl;
        }
        return itEnd;

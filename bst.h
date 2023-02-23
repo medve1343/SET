@@ -459,8 +459,12 @@ typename BST <T> ::iterator BST <T> :: erase(iterator & it)
    if (!it.pNode)
       return it;
 
+   auto itNext = it;
+   auto pDelete = it.pNode;
+
+   ++itNext;
    // Case 1: No Children
-   else if(!it.pNode->pRight && !it.pNode->pLeft)
+   if(!it.pNode->pRight && !it.pNode->pLeft)
    {
       if (it.pNode->isRightChild())
          it.pNode->pParent->pRight = nullptr;
@@ -500,32 +504,51 @@ typename BST <T> ::iterator BST <T> :: erase(iterator & it)
    // Case 3: Two Children
    else if(it.pNode->pLeft && it.pNode->pRight)
    {
-      auto itInOrderSuccessor = it.pNode->pRight;
-      while(itInOrderSuccessor->pLeft != nullptr)
-      {
-         itInOrderSuccessor = itInOrderSuccessor->pLeft;
-      }
-      // hold inOrderSuccessor's parent
-      auto inOrderRChild = itInOrderSuccessor->pRight;
-
-      // hold inOrderSuccessor's right child (it has no left)
-      it.pNode->pParent->pLeft = itInOrderSuccessor;
-      // set it->parent->child to itInOrderSuccessor
-      itInOrderSuccessor->pRight = it.pNode->pRight;
-      itInOrderSuccessor->pLeft = it.pNode->pLeft;
-      itInOrderSuccessor->pRight->pLeft = inOrderRChild;
-
-      // set inOrderSuccessor's children to it's children
-      itInOrderSuccessor->pParent = it.pNode->pParent;
-      itInOrderSuccessor->pRight->pParent = itInOrderSuccessor;
-      itInOrderSuccessor->pLeft->pParent = itInOrderSuccessor;
-      inOrderRChild->pParent = itInOrderSuccessor->pRight;
       // adopt the orphan
+
+      // find the in-order successor
+      auto pIOS = pDelete->pRight;
+      while (pIOS->pLeft)
+         pIOS = pIOS->pLeft;
+
+      // pIOS must not have a left????? node
+      assert(pIOS->pLeft == nullptr);
+      // take the place of pDelete
+      pIOS->pLeft = pDelete->pLeft;
+      if (pDelete->pLeft)
+         pDelete->pLeft->pParent = pIOS;
+
+      // If pIOS is not direct right sibling, swap it with pDelete
+      if (pDelete->pRight != pIOS)
+      {
+         // if the IOS has a right child, then it takes his place
+         if (pIOS->pRight)
+            pIOS->pRight->pParent = pIOS->pParent;
+         pIOS->pParent->pLeft = pIOS->pRight;
+
+         // make IOS's right child pDelete's right child
+         assert(pDelete->pRight);
+         pIOS->pRight = pDelete->pRight;
+         pDelete->pRight->pParent = pIOS;
+      }
+
+      // hook up pIOS's successor
+      pIOS->pParent = pDelete->pParent;
+      if (pDelete->pParent && pDelete->pParent->pLeft == pDelete)
+         pDelete->pParent->pLeft = pIOS;
+      else if (pDelete->pParent && pDelete->pParent->pRight == pDelete)
+         pDelete->pParent->pRight = pIOS;
+
+      // In case pDelete is the root
+      if (pDelete == root)
+         root = pIOS;
+
+      itNext = iterator(pIOS);
+
    }
-   delete it.pNode;
-   it.pNode = nullptr;
    numElements--;
-   return it;
+   delete pDelete;
+   return itNext;
 }
 
 /*****************************************************
